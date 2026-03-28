@@ -1,0 +1,8 @@
+{
+  "graphonomous": {
+    "type": "stdio",
+    "command": "/home/travis/ProjectAmp2/graphonomous/scripts/graphonomous_mcp_wrapper.sh",
+    "args": [],
+    "env": {}
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ampersand-protocol",
+  "description": "[&] Protocol toolkit — validate specs, generate schemas, inspect protocol graphs, and work with the Elixir reference implementation",
+  "author": {
+    "name": "Ampersand Box Design"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "graphonomous",
+  "description": "Graphonomous continual learning engine — persistent knowledge graph memory with retrieve/store/learn/deliberate loop, goal management, attention engine, and topology-aware reasoning via MCP",
+  "author": {
+    "name": "[&] Protocol / Ampersand Box Design"
+  }
+}

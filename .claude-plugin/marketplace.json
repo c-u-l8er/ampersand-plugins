@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ampersand-plugins",
+  "description": "Claude Code plugins for the [&] Protocol ecosystem — continual learning, spec-driven development, knowledge graphs, and autonomous agent tooling",
+  "owner": {
+    "name": "Ampersand Box Design",
+    "email": "hello@ampersandboxdesign.com"
+  },
+  "plugins": [
+    {
+      "name": "graphonomous",
+      "description": "Continual learning engine — persistent knowledge graph memory with retrieve/store/learn/deliberate loop, goal management, attention engine, and topology-aware κ routing via MCP. Always-on memory substrate for every session.",
+      "category": "productivity",
+      "source": "./plugins/graphonomous"
+    },
+    {
+      "name": "ampersand-protocol",
+      "description": "[&] Protocol toolkit — validate .ampersand.json specs, generate schemas, inspect protocol graphs, and work with the Elixir reference implementation.",
+      "category": "development",
+      "source": "./plugins/ampersand-protocol"
+    },
+    {
+      "name": "spec-driven-dev",
+      "description": "Spec-driven development workflow — read project specs, generate implementation plans, track spec coverage, and ensure code matches spec intent across the [&] portfolio.",
+      "category": "development",
+      "source": "./plugins/spec-driven-dev"
+    }
+  ]
+}
