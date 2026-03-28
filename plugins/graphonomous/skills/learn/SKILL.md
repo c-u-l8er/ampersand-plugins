@@ -29,20 +29,46 @@ learn_from_outcome(
 - `confidence` — 0.0–1.0, reliability of this feedback signal (NOT the original decision quality)
 - `causal_node_ids` — from `causal_context` saved during retrieval
 
-**Status meanings:**
-- `success` → boosts confidence of causal nodes
-- `failure` → reduces confidence of causal nodes
-- `partial_success` → small boost
-- `timeout` → minimal change (NOT the same as failure!)
+**Optional fields:**
+- `evidence` — structured evidence object (test results, metrics, user feedback)
+- `retrieval_trace_id` — audit trail linking back to the retrieval call
+- `decision_trace_id` — for multi-agent setups tracking decision provenance
+- `action_linkage` — metadata about what action was taken
+- `grounding` — outcome provenance (where the feedback signal came from)
 
-**Include evidence when practical:**
+**Status meanings and confidence effects:**
+- `success` → boosts confidence of causal nodes
+- `failure` → reduces confidence of causal nodes (the knowledge was wrong/misleading)
+- `partial_success` → small boost
+- `timeout` → minimal change — **NOT the same as failure!** Use when outcome is unknown.
+
+### Response structure
+
+The response contains per-node confidence updates:
+```json
+{
+  "processed": 3,
+  "skipped": 0,
+  "updates": [
+    {"node_id": "abc", "old_confidence": 0.7, "new_confidence": 0.78},
+    {"node_id": "def", "old_confidence": 0.6, "new_confidence": 0.67}
+  ]
+}
+```
+
+`processed` = causal nodes examined; `skipped` = nodes not found. Confidence adjustments are bounded — outcome confidence scales the delta (high-confidence feedback produces larger changes).
+
+## Full provenance example
+
 ```
 learn_from_outcome(
   action_id: "fix-auth-middleware",
   status: "success",
   confidence: 0.9,
   causal_node_ids: ["node-abc", "node-def"],
-  evidence: {"test_passed": true, "error_resolved": true}
+  evidence: {"test_passed": true, "error_resolved": true, "regression_check": "clean"},
+  retrieval_trace_id: "ret-12345",
+  grounding: "test suite output confirmed fix"
 )
 ```
 
@@ -53,7 +79,8 @@ learn_from_outcome(
 3. `learn_from_outcome(...)` with real causal IDs and honest status
 
 ## Anti-patterns to avoid
-- Fire and forget (never reporting outcomes)
-- Using `failure` when you mean `timeout`
-- Fabricating causal node IDs
-- Setting confidence to 1.0 on every outcome
+- Fire and forget — never reporting outcomes after using retrieved knowledge
+- Using `failure` when you mean `timeout` — timeout means unknown, not wrong
+- Fabricating causal node IDs — only use IDs from actual `causal_context`
+- Setting confidence to 1.0 on every outcome — calibrate by signal reliability
+- Discarding `causal_context` between retrieval and outcome — hold it in working memory

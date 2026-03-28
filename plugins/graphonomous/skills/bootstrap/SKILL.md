@@ -1,7 +1,6 @@
 ---
 name: bootstrap
 description: Use when starting a new session, switching topics, or when the user says "bootstrap", "start session", "initialize graphonomous", or "load memory". Activates the Graphonomous-first memory loop and orients on prior context.
-allowed-tools: [Read, Grep, Glob]
 ---
 
 # Graphonomous Bootstrap
@@ -17,7 +16,7 @@ Initialize the Graphonomous-first memory loop for this session.
 
 2. **Check active goals** to regain session continuity:
    ```
-   manage_goal(operation: "list_goals")
+   manage_goal(operation: "list_goals", filters: {"status": "active"})
    ```
 
 3. **Survey attention** to see what needs focus:
@@ -31,16 +30,38 @@ Initialize the Graphonomous-first memory loop for this session.
 
 ## Core Loop (apply for remainder of session)
 
-1. **Retrieve first** — `retrieve_context` before reasoning/acting
-2. **Reason and act** — use retrieved context + conversation
-3. **Store new knowledge** — `store_node` / `store_edge` for durable learnings
-4. **Close the loop** — `learn_from_outcome` when you have outcome signals
+For every non-trivial task, run this loop by default:
+
+1. **Retrieve first** — `retrieve_context` before reasoning/acting. Never skip for domain-specific work.
+2. **Reason and act** — use retrieved context + conversation to inform decisions
+3. **Store new knowledge** — `store_node` for durable atomic facts/procedures/events; `store_edge` only when the relationship genuinely improves retrieval
+4. **Close the loop** — `learn_from_outcome` whenever you have an outcome signal for a consequential action. Preserve `causal_context` between retrieval and outcome.
 5. **Maintain** — `run_consolidation` periodically and at session end
+
+## Node and Edge Discipline
+
+- Prefer **small, atomic nodes** — one fact/procedure/event per node
+- Choose node types correctly: `semantic` (facts), `procedural` (how-to), `episodic` (events)
+- Set confidence based on evidence quality, not optimism
+- Include `source` whenever possible (file path, URL, "conversation")
+- Create edges only when they improve retrieval: `causal`, `supports`, `contradicts`, `related`, `derived_from`
+
+## Hard Prohibitions
+
+Do NOT:
+- Skip retrieval habitually — prior context likely exists
+- Skip outcome learning on consequential actions
+- Inflate confidence indiscriminately (no blanket 0.9+)
+- Store kitchen-sink nodes (multiple unrelated facts)
+- Fabricate coverage signals or causal provenance
+- Ignore repeated `learn`/`escalate` decisions from coverage review
+- Create edge spaghetti (link everything to everything)
+- Neglect consolidation indefinitely
 
 ## Session End Checklist
 
 Before ending a productive session:
-1. Store key new knowledge discovered
-2. Report outcomes via `learn_from_outcome`
-3. Update goal progress
+1. Store key new knowledge discovered via `store_node`
+2. Report pending outcomes via `learn_from_outcome`
+3. Update goal progress via `manage_goal`
 4. Trigger `run_consolidation(action: "run_and_status", wait_ms: 2000)`

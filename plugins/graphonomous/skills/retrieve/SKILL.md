@@ -20,14 +20,33 @@ Search memory by natural language query:
 retrieve_context(query: "<query>", limit: 10, expansion_hops: 1)
 ```
 
-**Important:** Save the `causal_context` from the response — you need it for `learn_from_outcome` later.
+**All parameters:**
+- `query` (required) — natural language search
+- `limit` — max results (default 10)
+- `expansion_hops` — 0 = fast/precise, 1 = contextual neighbors, 2 = deep discovery
+- `neighbors_per_node` — how many neighbors per hop (default 4; use 8 for deep discovery)
+- `node_type` — filter: "semantic", "procedural", "episodic"
+- `min_score` — similarity threshold (0.0–1.0)
 
-**Filters available:**
-- `node_type`: "semantic", "procedural", "episodic"
-- `min_score`: 0.0–1.0 (similarity threshold)
-- `expansion_hops`: 0–2 (neighborhood expansion)
+**Deep discovery example:**
+```
+retrieve_context(query: "auth architecture", expansion_hops: 2, neighbors_per_node: 8)
+```
 
-**Watch for:** `topology.routing` — if it says `"deliberate"`, the knowledge has cycles (use `/graphonomous:deliberate`).
+### Response fields to use
+
+Each result node includes:
+- `similarity` — how closely the node matches your query (0.0–1.0)
+- `hops` — 0 = direct match, 1+ = reached via expansion
+- `via` — which edge/node path reached this result (for expansion hits)
+- `causal_context` — **save this array** — you need it for `learn_from_outcome`
+
+### Topology annotations
+
+The response includes a `topology` object:
+- `routing`: `"fast"` (no cycles, proceed normally) or `"deliberate"` (cycles found — use `/graphonomous:deliberate`)
+- `max_kappa` — cycle complexity (0 = acyclic)
+- `scc_count` — number of strongly connected components found
 
 ## Store New Knowledge
 
@@ -57,10 +76,16 @@ Connect related nodes when it improves retrieval:
 store_edge(source_id: "<id>", target_id: "<id>", edge_type: "supports", weight: 0.8)
 ```
 
-Edge types: `causal`, `supports`, `contradicts`, `related`, `derived_from`
+**Edge types:** `causal`, `supports`, `contradicts`, `related`, `derived_from`
+
+**Weight guidance:**
+- 0.8–1.0: Strong, well-evidenced relationship
+- 0.5–0.7: Moderate, reasonable inference
+- 0.2–0.4: Weak, tentative connection
 
 ## Anti-patterns to avoid
 - Skipping retrieval before acting (amnesia agent)
-- Storing kitchen-sink nodes with multiple facts
-- Discarding `causal_context` from retrieval
-- Setting all confidence to 0.9+
+- Storing kitchen-sink nodes with multiple facts — one atomic fact per node
+- Discarding `causal_context` from retrieval — hold it until outcome is resolved
+- Setting all confidence to 0.9+ — calibrate honestly
+- Storing duplicates — use `query_graph(operation: "similarity_search")` first; similarity > 0.90 = duplicate
