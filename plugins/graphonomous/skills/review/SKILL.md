@@ -77,6 +77,24 @@ Build the `signal` from REAL retrieval data — never fabricate:
 6. `supporting_evidence_count` — number of `supports` edges found
 7. `coverage_estimate` — your honest assessment (0.0–1.0)
 
+## Standalone Coverage Query (No Goal Required)
+
+For quick coverage assessment without a goal:
+
+```
+coverage_query(query: "auth middleware token validation", limit: 10, expansion_hops: 1)
+```
+
+Returns coverage score, decision (act/learn/escalate), relevant nodes, and confidence stats. Use this when you want a fast coverage check without creating or linking to a goal.
+
+**`coverage_query` vs `review_goal`:**
+| | `coverage_query` | `review_goal` |
+|---|---|---|
+| **Requires goal** | No | Yes |
+| **Requires signal** | No (auto-retrieves) | Yes (you build the signal) |
+| **State transitions** | None | Optional (apply_decision) |
+| **Use when** | Quick pre-action check | Formal goal-driven review |
+
 ## Workflow Patterns
 
 ### Pre-action gate

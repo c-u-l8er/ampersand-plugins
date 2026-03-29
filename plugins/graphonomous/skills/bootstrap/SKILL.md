@@ -58,6 +58,28 @@ Do NOT:
 - Create edge spaghetti (link everything to everything)
 - Neglect consolidation indefinitely
 
+## Available Resources (Read-Only Snapshots)
+
+| URI | What It Returns |
+|-----|----------------|
+| `graphonomous://runtime/health` | Runtime health, service status, counts |
+| `graphonomous://goals/snapshot` | Goal totals and status breakdown |
+| `graphonomous://graph/node/{id}` | Individual node details + edges |
+| `graphonomous://graph/recent` | Recently accessed nodes |
+| `graphonomous://consolidation/log` | Consolidator + orchestrator metrics |
+
+## Extended Tool Surface
+
+Beyond the core loop tools, these specialized tools are available:
+- **`graph_traverse`** — BFS walk from a node with depth/relationship filters
+- **`graph_stats`** — aggregate graph health (counts, distributions, orphans)
+- **`retrieve_episodic`** — time-range filtered episodic node retrieval
+- **`retrieve_procedural`** — semantic search scoped to procedural (how-to) nodes
+- **`coverage_query`** — standalone epistemic coverage check (no goal required)
+- **`learn_from_feedback`** — process positive/negative/correction on a node
+- **`learn_detect_novelty`** — check if a concept is novel to the graph
+- **`learn_from_interaction`** — full learning pipeline for user-model exchanges
+
 ## Session End Checklist
 
 Before ending a productive session:

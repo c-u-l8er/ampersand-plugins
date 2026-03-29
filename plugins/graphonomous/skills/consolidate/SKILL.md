@@ -52,6 +52,16 @@ Consolidation promotes nodes up tiers based on access frequency and confidence. 
 
 Consolidation also runs automatically during idle — manual triggers supplement this.
 
+## Consolidation Log Resource
+
+Read the current consolidation state and orchestrator metrics without triggering a cycle:
+
+```
+Resource URI: graphonomous://consolidation/log
+```
+
+Returns consolidator state (cycle count, last run, config) and orchestrator plasticity metrics (current learning rate, churn estimate, counters). Useful for monitoring without side effects.
+
 ## Health Indicators
 
 | Metric | Healthy Range | Problem If |

@@ -40,6 +40,28 @@ Embedding-based search. Returns nodes with similarity scores.
 
 **Operation aliases:** `"get"`, `"edges"`, `"list"` also work as shorthand.
 
+### Graph traverse (BFS walk)
+```
+graph_traverse(start_node_id: "<id>", max_depth: 3, relationship_types: "causal,supports")
+```
+BFS walk from a starting node. Returns visited nodes, edges, depth map, and traversal metadata. Optionally filter by relationship types (comma-separated).
+
+### Graph stats (aggregate health)
+```
+graph_stats()
+```
+Returns node/edge counts, type distributions, confidence statistics (mean/min/max/std_dev), and orphan count (nodes with no edges). No parameters required.
+
+## Resources (Read-Only Snapshots)
+
+| URI | What It Returns |
+|-----|----------------|
+| `graphonomous://runtime/health` | Runtime health, service status, lightweight counts |
+| `graphonomous://goals/snapshot` | Goal totals, status breakdown, serialized goals |
+| `graphonomous://graph/node/{id}` | Individual node details + connected edges |
+| `graphonomous://graph/recent` | Recently added/accessed nodes, sorted by recency |
+| `graphonomous://consolidation/log` | Consolidator state + orchestrator plasticity metrics |
+
 ## `retrieve_context` vs `similarity_search`
 
 | | `retrieve_context` | `query_graph(similarity_search)` |

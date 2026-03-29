@@ -48,6 +48,20 @@ The response includes a `topology` object:
 - `max_kappa` — cycle complexity (0 = acyclic)
 - `scc_count` — number of strongly connected components found
 
+## Specialized Retrieval
+
+### Retrieve episodic nodes (events/observations)
+```
+retrieve_episodic(since: "2026-03-01T00:00:00Z", until: "2026-03-29T23:59:59Z", limit: 20)
+```
+Time-range filtered retrieval of episodic nodes, sorted by recency. All parameters are optional.
+
+### Retrieve procedural nodes (how-to knowledge)
+```
+retrieve_procedural(query: "how to deploy the auth service", limit: 10, min_confidence: 0.5)
+```
+Semantic search scoped to procedural nodes. Returns nodes with extracted steps from content.
+
 ## Store New Knowledge
 
 After acting on retrieved context, store what you learned:

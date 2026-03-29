@@ -30,17 +30,19 @@ Workflow type: $ARGUMENTS
 ## Answer a Question
 1. `retrieve_context(query: "<the question>")` — save `causal_context`
 2. Check `topology.routing` — if `"deliberate"`, run `deliberate(query: "...")`
-3. Answer using retrieved knowledge + current conversation
-4. `store_node(node_type: "semantic", content: "<synthesized answer>", source: "conversation")`
-5. If user confirms → `learn_from_outcome(status: "success", causal_node_ids: [...])`
+3. Optionally `coverage_query(query: "<the question>")` for quick act/learn/escalate pre-check
+4. Answer using retrieved knowledge + current conversation
+5. `store_node(node_type: "semantic", content: "<synthesized answer>", source: "conversation")`
+6. If user confirms → `learn_from_outcome(status: "success", causal_node_ids: [...])`
 
 ## Explore a Codebase
 1. Create parent goal: `manage_goal(operation: "create_goal", payload: {"title": "Explore <repo>"})`
 2. Create sub-goals per module (3–6), each with `parent_goal_id`
 3. For each module: explore → `store_node` per finding → `store_edge` for cross-module relationships
-4. `manage_goal(operation: "link_nodes", ...)` — link findings to sub-goals
-5. `manage_goal(operation: "set_progress", ...)` after each module
-6. `review_goal` on parent when all sub-goals done
+4. Use `graph_traverse(start_node_id: "<id>", max_depth: 2)` to walk related knowledge
+5. `manage_goal(operation: "link_nodes", ...)` — link findings to sub-goals
+6. `manage_goal(operation: "set_progress", ...)` after each module
+7. `review_goal` on parent when all sub-goals done
 
 ## Debug a Problem
 1. `retrieve_context(query: "prior context on <issue>")` — save `causal_context`
@@ -67,10 +69,11 @@ Workflow type: $ARGUMENTS
 7. Repeat; `run_consolidation` every 4–5 cycles
 
 ## Maintenance
-1. `run_consolidation(action: "run_and_status", wait_ms: 2000)`
-2. `manage_goal(operation: "list_goals")` — review all goals
-3. Re-review any active goals near completion thresholds
-4. Transition stale goals to `suspended` or `abandoned` with metadata
+1. `graph_stats()` — check overall graph health (orphans, edge ratio, confidence distribution)
+2. `run_consolidation(action: "run_and_status", wait_ms: 2000)`
+3. `manage_goal(operation: "list_goals")` — review all goals
+4. Re-review any active goals near completion thresholds
+5. Transition stale goals to `suspended` or `abandoned` with metadata
 
 ## Teach a Domain
 1. `manage_goal(operation: "create_goal", payload: {"title": "Learn <domain>"})`

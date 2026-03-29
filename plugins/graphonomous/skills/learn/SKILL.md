@@ -78,6 +78,44 @@ learn_from_outcome(
 2. Act on retrieved knowledge
 3. `learn_from_outcome(...)` with real causal IDs and honest status
 
+## Learn from Feedback
+
+Process explicit feedback on a specific node:
+
+```
+learn_from_feedback(node_id: "<id>", feedback_type: "positive")
+learn_from_feedback(node_id: "<id>", feedback_type: "negative")
+learn_from_feedback(node_id: "<id>", feedback_type: "correction", correction: "The correct fact is...")
+```
+
+- `positive` → routes through `learn_from_outcome` with status `success`
+- `negative` → routes through `learn_from_outcome` with status `failure`
+- `correction` → directly updates the node content
+
+## Detect Novelty
+
+Check if a query represents knowledge not yet in the graph:
+
+```
+learn_detect_novelty(query: "some new concept", threshold: 0.35)
+```
+
+Returns `is_novel` (bool), `novelty_score` (0.0–1.0), and `nearest_nodes` with similarity scores. Higher novelty = less existing coverage.
+
+## Learn from Interaction
+
+Full learning pipeline for a user-model exchange:
+
+```
+learn_from_interaction(
+  user_message: "How does the auth middleware work?",
+  model_response: "The auth middleware validates JWT tokens and...",
+  novelty_threshold: 0.35
+)
+```
+
+Pipeline: novelty check → store episodic node → extract semantic claims from response → create `derived_from` edges → link to nearest existing nodes.
+
 ## Anti-patterns to avoid
 - Fire and forget — never reporting outcomes after using retrieved knowledge
 - Using `failure` when you mean `timeout` — timeout means unknown, not wrong
