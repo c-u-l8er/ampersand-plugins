@@ -25,7 +25,7 @@ retrieve_context(query: "<query>", limit: 10, expansion_hops: 1)
 - `limit` — max results (default 10)
 - `expansion_hops` — 0 = fast/precise, 1 = contextual neighbors, 2 = deep discovery
 - `neighbors_per_node` — how many neighbors per hop (default 4; use 8 for deep discovery)
-- `node_type` — filter: "semantic", "procedural", "episodic"
+- `node_type` — filter: "semantic", "procedural", "episodic", "temporal", "outcome", "goal"
 - `min_score` — similarity threshold (0.0–1.0)
 
 **Deep discovery example:**
@@ -74,6 +74,9 @@ store_node(content: "<one atomic fact>", node_type: "semantic", confidence: 0.7,
 - `semantic` — facts, definitions, architecture ("what is?")
 - `procedural` — workflows, how-to, recipes ("how to?")
 - `episodic` — events, observations, outcomes ("what happened?")
+- `temporal` — time-bound observations, monitoring events ("when did X happen?")
+- `outcome` — measured results, benchmark scores ("what was the result?")
+- `goal` — objectives, targets, intent ("what are we trying to achieve?")
 
 **Confidence calibration:**
 - 0.9–1.0: Directly observed in code/docs
@@ -90,7 +93,7 @@ Connect related nodes when it improves retrieval:
 store_edge(source_id: "<id>", target_id: "<id>", edge_type: "supports", weight: 0.8)
 ```
 
-**Edge types:** `causal`, `supports`, `contradicts`, `related`, `derived_from`
+**Edge types:** `causal`, `causes`, `resolves`, `supports`, `contradicts`, `related`, `related_to`, `part_of`, `follows`, `supersedes`, `depends_on`, `similar_to`, `derived_from`, `temporal_before`, `temporal_after`, `co_occurs`
 
 **Weight guidance:**
 - 0.8–1.0: Strong, well-evidenced relationship

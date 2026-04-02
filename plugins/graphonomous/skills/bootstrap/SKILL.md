@@ -41,10 +41,10 @@ For every non-trivial task, run this loop by default:
 ## Node and Edge Discipline
 
 - Prefer **small, atomic nodes** — one fact/procedure/event per node
-- Choose node types correctly: `semantic` (facts), `procedural` (how-to), `episodic` (events)
+- Choose node types correctly: `semantic` (facts), `procedural` (how-to), `episodic` (events), `temporal` (time-bound observations), `outcome` (measured results), `goal` (objectives/targets)
 - Set confidence based on evidence quality, not optimism
 - Include `source` whenever possible (file path, URL, "conversation")
-- Create edges only when they improve retrieval: `causal`, `supports`, `contradicts`, `related`, `derived_from`
+- Create edges only when they improve retrieval: `causal`, `causes`, `resolves`, `supports`, `contradicts`, `related`, `related_to`, `part_of`, `follows`, `supersedes`, `depends_on`, `similar_to`, `derived_from`, `temporal_before`, `temporal_after`, `co_occurs`
 
 ## Hard Prohibitions
 
@@ -79,6 +79,8 @@ Beyond the core loop tools, these specialized tools are available:
 - **`learn_from_feedback`** — process positive/negative/correction on a node
 - **`learn_detect_novelty`** — check if a concept is novel to the graph
 - **`learn_from_interaction`** — full learning pipeline for user-model exchanges
+- **`delete_node`** — remove a node and its connected edges
+- **`manage_edge`** — edge lifecycle: list_all, list_for_node, update, delete
 
 ## Session End Checklist
 

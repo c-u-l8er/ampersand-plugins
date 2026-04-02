@@ -18,7 +18,7 @@ Operation and target: $ARGUMENTS
 ```
 query_graph(operation: "list_nodes", node_type: "semantic", min_confidence: 0.5, limit: 20)
 ```
-Browse what's stored. Filter by `node_type`, `min_confidence`, `max_confidence`, `limit`.
+Browse what's stored. Filter by `node_type` (semantic, procedural, episodic, temporal, outcome, goal), `min_confidence`, `max_confidence`, `limit`.
 
 ### Get a specific node
 ```
@@ -51,6 +51,21 @@ BFS walk from a starting node. Returns visited nodes, edges, depth map, and trav
 graph_stats()
 ```
 Returns node/edge counts, type distributions, confidence statistics (mean/min/max/std_dev), and orphan count (nodes with no edges). No parameters required.
+
+### Manage edges
+```
+manage_edge(operation: "list_all")
+manage_edge(operation: "list_for_node", node_id: "<id>")
+manage_edge(operation: "update", edge_id: "<id>", weight: 0.9, co_activation_count: 5)
+manage_edge(operation: "delete", edge_id: "<id>")
+```
+Full edge lifecycle management: list, update weight/co_activation_count/decay_rate, or delete.
+
+### Delete a node
+```
+delete_node(node_id: "<id>")
+```
+Remove a node and its connected edges from the graph.
 
 ## Resources (Read-Only Snapshots)
 
