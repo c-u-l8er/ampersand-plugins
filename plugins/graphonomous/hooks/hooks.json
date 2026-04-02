@@ -1,0 +1,17 @@
+{
+  "description": "Tracks filesystem changes made by Claude Code for Graphonomous knowledge graph sync. PostToolUse on Write/Edit appends changed file paths to /tmp/graphonomous-changed-files.jsonl. Use /graphonomous:sync to batch-ingest tracked changes.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-file-changes.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
