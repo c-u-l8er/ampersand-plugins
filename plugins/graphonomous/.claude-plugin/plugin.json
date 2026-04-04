@@ -1,6 +1,6 @@
 {
   "name": "graphonomous",
-  "description": "Graphonomous continual learning engine — persistent knowledge graph memory with retrieve/store/learn/deliberate loop, goal management, attention engine, and topology-aware reasoning via MCP",
+  "description": "Graphonomous v0.3.2 continual learning engine — 28 MCP tools for persistent knowledge graph memory with retrieve/store/learn/deliberate loop, belief revision, intentional forgetting, epistemic frontier, goal management, attention engine, and topology-aware κ-routing. GraphMemBench: 120/120 scenarios across 15 categories",
   "author": {
     "name": "[&] Protocol / Ampersand Box Design"
   }

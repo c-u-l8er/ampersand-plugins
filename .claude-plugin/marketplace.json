@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "graphonomous",
-      "description": "Continual learning engine — persistent knowledge graph memory with retrieve/store/learn/deliberate loop, goal management, attention engine, and topology-aware κ routing via MCP. Always-on memory substrate for every session.",
+      "description": "Continual learning engine v0.3.2 — 28 MCP tools for persistent knowledge graph memory with belief revision, intentional forgetting, epistemic frontier, goal management, attention engine, and topology-aware κ-routing. GraphMemBench: 120/120 across 15 categories.",
       "category": "productivity",
       "source": "./plugins/graphonomous"
     },
