@@ -12,38 +12,6 @@ Phase 5 of the PRISM evaluation loop. This is what makes PRISM a diagnostic tool
 
 Action to perform: $ARGUMENTS
 
-## Diagnostic Actions
-
-### Full diagnostic report
-```
-diagnose(action: "report", system_id: "<uuid>", cycle: 1)
-```
-
-### Clustered failure pattern analysis
-```
-diagnose(action: "failure_patterns", system_id: "<uuid>", dimension: "stability")
-```
-
-### Re-run scenarios after a fix
-```
-diagnose(action: "retest", system_id: "<uuid>", scenario_ids: "[\"uuid1\"]", version: "v0.4.1")
-```
-
-### Before/after verification report
-```
-diagnose(action: "verify", retest_run_id: "<uuid>")
-```
-
-### Cross-cycle regression alerts
-```
-diagnose(action: "regressions", system_id: "<uuid>", from_cycle: 1, to_cycle: 3)
-```
-
-### AI-generated fix suggestions
-```
-diagnose(action: "suggest_fixes", system_id: "<uuid>", dimension: "stability")
-```
-
 ## Leaderboard Actions
 
 ### Current rankings
@@ -66,19 +34,59 @@ diagnose(action: "compare_systems", system_a: "graphonomous", system_b: "mem0", 
 diagnose(action: "dimension_leaders", cycle: 1, domain: "code")
 ```
 
+## Diagnostic Actions
+
+### Full diagnostic report
+```
+diagnose(action: "report", system_id: "<uuid>", cycle: 1)
+```
+Comprehensive diagnostic: failures, fixes, regressions in one report.
+
+### Clustered failure analysis
+```
+diagnose(action: "failure_patterns", system_id: "<uuid>", dimension: "stability")
+```
+Groups failures by dimension and identifies patterns.
+
+### Re-run scenarios after a fix
+```
+diagnose(action: "retest", system_id: "<uuid>", scenario_ids: "[\"<uuid>\", ...]", version: "v0.4.1")
+```
+Re-runs specific scenarios to verify a fix. Tag with version label.
+
+### Before/after comparison
+```
+diagnose(action: "verify", retest_run_id: "<uuid>")
+```
+Compares original vs retest scores to confirm improvement.
+
+### Cross-cycle regression analysis
+```
+diagnose(action: "regressions", system_id: "<uuid>", from_cycle: 1, to_cycle: 5)
+```
+Detects dimensions or scenarios that regressed between cycles.
+
+### Fix suggestions
+```
+diagnose(action: "suggest_fixes", system_id: "<uuid>", dimension: "transfer")
+```
+AI-generated fix suggestions based on failure patterns.
+
 ## Task-Fit Actions
 
 ### System recommendation for a task profile
 ```
-diagnose(action: "fit_recommendation", profile_id: "<uuid>", budget: "low")
+diagnose(action: "fit_recommendation", profile_id: "<uuid>", budget: "medium")
 ```
+Recommends the best system for a given task profile and budget.
 
 ### Compare two systems for a specific task
 ```
 diagnose(action: "compare_fit", system_a: "graphonomous", system_b: "mem0", profile_id: "<uuid>")
 ```
 
-### List available task profiles
+### List task profiles
 ```
 diagnose(action: "task_profiles")
 ```
+Lists pre-built and custom task profiles with their dimension priorities.

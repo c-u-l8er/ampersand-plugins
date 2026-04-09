@@ -39,24 +39,28 @@ Run each scenario against the target system.
 
 ### 5. Judge transcripts
 ```
-observe(action: "judge_transcript", transcript_id: "<uuid>", judge_model: "gpt-4o")
+observe(action: "judge_transcript", transcript_id: "<uuid>", reason: "<JSON array of agent judgments>")
 ```
-Score all 9 CL dimensions per transcript.
+The agent provides per-dimension judgments (PRISM stores them — no LLM calls inside PRISM).
+Valid dimensions: stability, plasticity, knowledge_update, temporal, consolidation, epistemic_awareness, transfer, forgetting, feedback.
 
-### 6. Meta-judge
+### 6. Meta-judge (L3 quality check)
 ```
 observe(action: "meta_judge_batch", run_id: "<uuid>", meta_judge_model: "claude-sonnet-4-20250514")
 ```
+Validates L2 judgment quality. Use a different model than the L2 judge.
 
 ### 7. Analyze results
 ```
+diagnose(action: "report", system_id: "<uuid>", cycle: 1)
 diagnose(action: "leaderboard")
-diagnose(action: "report", system_id: "<uuid>")
+diagnose(action: "compare_systems", system_a: "graphonomous", system_b: "mem0", cycle: 1)
 ```
 
 ### 8. Reflect and evolve
 ```
 reflect(action: "analyze_gaps")
+reflect(action: "evolve", recommendations: "<from analyze_gaps output>")
 reflect(action: "calibrate_irt")
 ```
 

@@ -22,8 +22,9 @@ Identifies: under-tested dimensions, saturated scenarios, low-variance dims, dom
 
 ### Evolve scenarios based on gap analysis
 ```
-reflect(action: "evolve", cycle: 1, recommendations: "[{\"action\": \"retire\", \"scenario_id\": \"...\", \"reason\": \"saturated\"}]")
+reflect(action: "evolve", cycle: 1, recommendations: "[{\"action\": \"retire\", \"scenario_id\": \"<uuid>\", \"reason\": \"saturated\"}, ...]")
 ```
+Apply gap analysis recommendations: retire, extend, fork, or promote scenarios.
 
 ### Advance to next evaluation cycle
 ```
@@ -41,13 +42,16 @@ Updates difficulty and discrimination parameters from accumulated cycle data.
 ```
 reflect(action: "cycle_history")
 ```
+Full history of cycles and improvements.
 
-### BYOR system recommendation
+### System recommendation for your use case (BYOR)
 ```
-reflect(action: "byor_recommend", repo_anchor_id: "<uuid>", budget: "low", priorities: "{\"stability\": 0.3, \"plasticity\": 0.2}")
+reflect(action: "byor_recommend", repo_anchor_id: "<uuid>", priorities: "{\"stability\": 0.3, \"transfer\": 0.3}", budget: "low")
 ```
+Recommends a memory system based on your repo's patterns and priorities.
 
-### Infer task profile from repo
+### Infer task profile from repo patterns (BYOR)
 ```
 reflect(action: "byor_infer_profile", repo_anchor_id: "<uuid>")
 ```
+Analyzes your repo's commit history and auto-discovers which CL dimensions matter most.

@@ -1,6 +1,6 @@
 ---
 name: compose
-description: Use when the user wants to create test scenarios, validate scenario coverage, list/search scenarios, or import from external benchmarks. Triggers on "create scenarios", "build test suite", "validate coverage", "list scenarios", "import from BEAM". Routes through the `compose` machine.
+description: Use when the user wants to create test scenarios, validate scenario coverage, list/search scenarios, or register repo anchors. Triggers on "create scenarios", "build test suite", "validate coverage", "list scenarios". Routes through the `compose` machine.
 argument-hint: <action> [options]
 ---
 
@@ -14,10 +14,13 @@ Action to perform: $ARGUMENTS
 
 ## Actions
 
-### Generate scenarios from a repo anchor
+### Store agent-composed scenarios
 ```
-compose(action: "scenarios", repo_anchor_id: "<uuid>", count: 10, focus_dimensions: "[\"stability\", \"plasticity\"]")
+compose(action: "scenarios", scenario_ids: "<JSON array of scenario objects>")
 ```
+The agent composes scenarios externally and passes them as structured JSON. Each scenario needs: kind, domain, difficulty, persona, sessions (with turns and cl_challenges), cl_challenges (with dimensions).
+
+PRISM is a pure data layer — no LLM calls happen inside PRISM. The calling agent does all composition.
 
 ### Validate CL coverage of scenarios
 ```
@@ -41,14 +44,10 @@ compose(action: "retire", scenario_id: "<uuid>", reason: "saturated")
 ```
 Reasons: saturated, ambiguous, too_hard, duplicate. Anchor scenarios cannot be retired.
 
-### Import from external benchmarks
-```
-compose(action: "import", source: "BEAM", file_path: "/path/to/data.json", domain: "code")
-```
-
 ### BYOR (Bring Your Own Repo)
 ```
-compose(action: "byor_register", repo_url: "https://github.com/user/repo", domain: "code")
+compose(action: "byor_register", repo_url: "/path/to/local/repo", domain: "code", commit_range: "HEAD~20..HEAD")
 compose(action: "byor_discover", repo_anchor_id: "<uuid>")
-compose(action: "byor_generate", repo_anchor_id: "<uuid>", count: 10)
 ```
+
+**NOTE**: `import` and `byor_generate` are NOT implemented. Use `scenarios` to store agent-composed scenarios.

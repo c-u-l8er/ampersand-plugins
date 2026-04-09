@@ -18,16 +18,18 @@ Action to perform: $ARGUMENTS
 ```
 interact(action: "run", scenario_id: "<uuid>", system_id: "<uuid>", llm_backend: "claude-sonnet-4-20250514")
 ```
+**NOTE**: `llm_backend` is required — omitting it returns an error.
 
 ### Run a scenario sequence (closed-loop, no memory reset)
 ```
 interact(action: "run_sequence", sequence_id: "<uuid>", system_id: "<uuid>", llm_backend: "claude-sonnet-4-20250514")
 ```
 
-### Run full evaluation matrix
+### Run matrix evaluation (N systems × M models × all scenarios)
 ```
 interact(action: "run_matrix", suite_id: "<uuid>", systems: "[\"sys1\", \"sys2\"]", models: "[\"claude-sonnet-4-20250514\", \"gpt-4o\"]")
 ```
+Full cross-product evaluation across systems and models.
 
 ### Check run status
 ```
@@ -43,3 +45,15 @@ interact(action: "transcript", transcript_id: "<uuid>")
 ```
 interact(action: "cancel", run_id: "<uuid>")
 ```
+
+### Full BYOR evaluation
+```
+interact(action: "byor_evaluate", repo_anchor_id: "<uuid>", system_id: "<uuid>")
+```
+Runs all auto-discovered CL scenarios from your repo against a memory system.
+
+### Head-to-head BYOR comparison
+```
+interact(action: "byor_compare", repo_anchor_id: "<uuid>", system_a: "graphonomous", system_b: "mem0")
+```
+Compares two systems on your repo's CL scenarios side-by-side.

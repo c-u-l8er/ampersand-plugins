@@ -38,5 +38,6 @@ Weights must sum to 1.0. Requires governance approval during active cycles.
 
 ### Create a custom task profile
 ```
-config(action: "create_profile", name: "code_review_agent", dimension_priorities: "{\"stability\": 0.3, \"knowledge_update\": 0.25}", domains: "[\"code\"]")
+config(action: "create_profile", name: "high-churn-codebase", dimension_priorities: "{\"plasticity\": 0.3, \"knowledge_update\": 0.25, \"stability\": 0.2}", domains: "[\"code\", \"ops\"]")
 ```
+Defines dimension priorities and target domains for task-fit recommendations.
