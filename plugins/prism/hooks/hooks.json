@@ -1,0 +1,4 @@
+{
+  "description": "PRISM evaluation engine hooks. Currently minimal — no file tracking needed since PRISM is a benchmarking tool, not a knowledge graph.",
+  "hooks": {}
+}

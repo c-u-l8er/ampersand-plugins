@@ -1,0 +1,7 @@
+{
+  "name": "prism",
+  "description": "PRISM v0.1.0 — Self-Improving Continual Learning Evaluation Engine (OS-009). 6 MCP machine tools for diagnostic benchmarking of AI agent memory systems. Compose scenarios from git repos, interact via user simulator, observe with 3-layer judging (L2 dimension + L3 meta-judge), reflect with IRT calibration and gap analysis, diagnose with actionable failure patterns and fix-and-retest verification. 9 CL dimensions, domain filtering, Bring-Your-Own-Repo, system-task fit recommendations. Dual-loop architecture interlocks with Graphonomous (11 total tools).",
+  "author": {
+    "name": "[&] Protocol / Ampersand Box Design"
+  }
+}

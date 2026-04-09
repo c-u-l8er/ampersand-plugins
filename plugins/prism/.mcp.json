@@ -1,0 +1,8 @@
+{
+  "prism": {
+    "type": "stdio",
+    "command": "/home/travis/ProjectAmp2/PRISM/scripts/prism_mcp_wrapper.sh",
+    "args": [],
+    "env": {}
+  }
+}
