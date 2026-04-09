@@ -24,6 +24,12 @@
       "description": "Spec-driven development workflow — read project specs, generate implementation plans, track spec coverage, and ensure code matches spec intent across the [&] portfolio.",
       "category": "development",
       "source": "./plugins/spec-driven-dev"
+    },
+    {
+      "name": "prism",
+      "description": "PRISM v0.1.0 — Self-Improving Continual Learning Evaluation Engine (OS-009). 6 MCP machine tools for diagnostic benchmarking of AI agent memory systems across 9 CL dimensions with 3-layer judging, IRT calibration, and actionable diagnostics.",
+      "category": "productivity",
+      "source": "./plugins/prism"
     }
   ]
 }
