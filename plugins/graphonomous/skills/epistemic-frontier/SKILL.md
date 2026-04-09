@@ -1,6 +1,6 @@
 ---
 name: epistemic-frontier
-description: Use when you need to identify where uncertainty is highest in the knowledge graph, prioritize investigation, or quantify confidence bounds. Use when the user says "where is uncertainty highest?", "what should I investigate?", "show epistemic frontier", "Wilson intervals", "information gain", or "what don't we know?".
+description: Use when you need to identify where uncertainty is highest in the knowledge graph, prioritize investigation, or quantify confidence bounds. Use when the user says "where is uncertainty highest?", "what should I investigate?", "show epistemic frontier", "Wilson intervals", "information gain", "what don't we know?", or "uncertainty analysis". Routes through the `retrieve` machine.
 argument-hint: [min_gap] [limit]
 ---
 
@@ -15,7 +15,7 @@ Optional parameters: $ARGUMENTS
 ## Query the Frontier
 
 ```
-epistemic_frontier(limit: 5, min_gap: 0.3)
+retrieve(action: "frontier", limit: 5, min_gap: 0.3)
 ```
 
 Response:
@@ -49,11 +49,11 @@ Only nodes with `evidence_count > 0` appear on the frontier. Nodes without evide
 
 ## The Investigation Loop
 
-1. **Query frontier** → `epistemic_frontier(limit: 5, min_gap: 0.3)`
-2. **Pick highest info_gain node** → investigate it (run tests, check docs, verify claims)
-3. **Report outcome** → `learn_from_outcome(causal_node_ids: ["<frontier_node>"], status: "success", ...)`
-4. **Re-query frontier** → the investigated node should have narrowed or dropped off
-5. **Repeat** → each cycle reduces graph uncertainty where it matters most
+1. **Query frontier** — `retrieve(action: "frontier", limit: 5, min_gap: 0.3)`
+2. **Pick highest info_gain node** — investigate it (run tests, check docs, verify claims)
+3. **Report outcome** — `learn(action: "from_outcome", causal_node_ids: ["<frontier_node>"], status: "success", ...)`
+4. **Re-query frontier** — the investigated node should have narrowed or dropped off
+5. **Repeat** — each cycle reduces graph uncertainty where it matters most
 
 ## Wilson Score Intervals
 
@@ -66,22 +66,22 @@ The frontier uses Wilson score confidence intervals (z=1.96 for 95% confidence):
 
 This is why the frontier is powerful: it tells you exactly where one more data point would have the biggest impact.
 
-## Integration with Other Tools
+## Integration with Other Machines
 
-### Frontier + Learn from Outcome
-Every `learn_from_outcome` call increments `evidence_count` and updates `confidence` on causal nodes. This naturally narrows their Wilson intervals and may drop them off the frontier.
+### Frontier + Learn
+Every `learn(action: "from_outcome", ...)` call increments `evidence_count` and updates `confidence` on causal nodes. This naturally narrows their Wilson intervals and may drop them off the frontier.
 
 ### Frontier + Coverage Review
 Use frontier data to inform coverage decisions:
 ```
-review_goal(goal_id: "...", signal: "frontier shows 3 high-uncertainty nodes in this area")
+route(action: "review_goal", goal_id: "...", signal: "frontier shows 3 high-uncertainty nodes in this area")
 ```
 If key nodes are on the frontier, coverage review may route to `learn` instead of `act`.
 
 ### Frontier + Attention
 The attention engine can incorporate frontier data when prioritizing goals — goals with high-uncertainty supporting knowledge may need investigation before execution.
 
-## Anti-Patterns
+## Anti-patterns to avoid
 
 - Don't ignore high-information-gain nodes — they're where learning has most value
 - Don't assume evidence_count=0 nodes are "fine" — they're just not measurable yet

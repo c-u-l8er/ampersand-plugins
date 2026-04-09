@@ -1,6 +1,6 @@
 ---
 name: trace-evidence-path
-description: Use when the user asks "why did you conclude X?", "trace the evidence", "show the reasoning chain", "how are these connected?", "find the path between nodes", or wants to understand provenance between two knowledge nodes. Weighted Dijkstra shortest-path tracing through the knowledge graph.
+description: Use when the user asks "why did you conclude X?", "trace the evidence", "show the reasoning chain", "how are these connected?", "find the path between nodes", "explain the provenance", or wants to understand evidence chains between two knowledge nodes. Weighted Dijkstra shortest-path tracing. Routes through the `retrieve` machine.
 argument-hint: <from_node_id> <to_node_id> [k=3]
 ---
 
@@ -24,14 +24,14 @@ From/to node IDs and options: $ARGUMENTS
 
 ### Trace shortest evidence path
 ```
-trace_evidence_path(from: "<source_node_id>", to: "<target_node_id>")
+retrieve(action: "trace_evidence", source_id: "<source_node_id>", target_id: "<target_node_id>")
 ```
 
 Returns the single lowest-cost path with per-edge cost breakdown.
 
 ### Find K alternate paths
 ```
-trace_evidence_path(from: "<source_node_id>", to: "<target_node_id>", k: 3)
+retrieve(action: "trace_evidence", source_id: "<source_node_id>", target_id: "<target_node_id>", k: 3)
 ```
 
 Returns up to K paths ranked by total cost, using Yen's algorithm. Useful for finding diverse reasoning chains.
@@ -40,8 +40,8 @@ Returns up to K paths ranked by total cost, using Yen's algorithm. Useful for fi
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `from` | string | _(required)_ | Source node ID |
-| `to` | string | _(required)_ | Target node ID |
+| `source_id` | string | _(required)_ | Source node ID |
+| `target_id` | string | _(required)_ | Target node ID |
 | `k` | number | 1 | Number of alternate paths (max 10) |
 | `half_life_hours` | number | 168.0 | Recency decay half-life (lower = prefer recent edges) |
 | `bidirectional` | boolean | true | Search edges in both directions |
@@ -89,32 +89,25 @@ cost = -log(confidence) + recency_decay(age_hours / half_life) + type_cost(edge_
 
 ## Full Workflow
 
-1. **Identify endpoints** — use `retrieve_context` or `query_graph` to find the two nodes you want to connect.
-2. **Trace path** — `trace_evidence_path(from: "<id_a>", to: "<id_b>", k: 3)`
+1. **Identify endpoints** — use `retrieve(action: "context", ...)` or `consolidate(action: "query", ...)` to find the two nodes you want to connect.
+2. **Trace path** — `retrieve(action: "trace_evidence", source_id: "<id_a>", target_id: "<id_b>", k: 3)`
 3. **Interpret costs** — low total cost = strong evidence chain. Check for `contradicts` edges in any path.
-4. **Report to user** — summarize the chain in natural language: "Node A is connected to Node B through 3 hops: A -[causal]-> C -[supports]-> D -[causal]-> B, total cost 0.42."
+4. **Report to user** — summarize the chain in natural language.
 5. **Store episodic** — if the trace revealed something important, store it as an episodic node.
 
-## Combining with Other Tools
+## Combining with Other Machines
 
 | Scenario | Workflow |
 |----------|----------|
-| Verify deliberation output | `deliberate` → `trace_evidence_path` from source to conclusion |
-| Audit before high-stakes action | `retrieve_context` → identify causal chain → `trace_evidence_path` to verify |
-| Investigate contradiction | `belief_contradictions` → find conflicting nodes → `trace_evidence_path` between them |
-| Topology + path | `topology_analyze` → identify SCC members → `trace_evidence_path` within the cycle |
-| Goal provenance | `review_goal` → get linked nodes → `trace_evidence_path` from evidence to goal |
-
-## When NOT to Use
-
-- When you already know the direct edge between two nodes (just use `query_graph(operation: "get_edges")`)
-- For broad similarity search (use `retrieve_context` instead)
-- When the nodes are unconnected — the tool returns an empty array; use `graph_traverse` for BFS exploration instead
-- For topology analysis (κ/SCC) — use `topology_analyze`
+| Verify deliberation output | `route(action: "deliberate")` -> `retrieve(action: "trace_evidence")` from source to conclusion |
+| Audit before high-stakes action | `retrieve(action: "context")` -> identify causal chain -> `retrieve(action: "trace_evidence")` to verify |
+| Investigate contradiction | `learn(action: "contradictions")` -> find conflicting nodes -> `retrieve(action: "trace_evidence")` between them |
+| Topology + path | `route(action: "topology")` -> identify SCC members -> `retrieve(action: "trace_evidence")` within the cycle |
+| Goal provenance | `route(action: "review_goal")` -> get linked nodes -> `retrieve(action: "trace_evidence")` from evidence to goal |
 
 ## Tuning Tips
 
 - **Lower `half_life_hours`** (e.g., 24) to strongly prefer recent evidence chains.
-- **Set `bidirectional: false`** to enforce strict causal direction (A caused B, not B caused A).
+- **Set `bidirectional: false`** to enforce strict causal direction.
 - **Increase `k`** to find diverse paths — if path 1 goes through node X but path 2 doesn't, node X is not the only link.
 - **Increase `max_hops`** for large graphs where the two nodes are far apart.

@@ -15,7 +15,8 @@ Action and status: $ARGUMENTS
 ## Report an Outcome
 
 ```
-learn_from_outcome(
+learn(
+  action: "from_outcome",
   action_id: "descriptive-slug-of-what-you-did",
   status: "success",
   confidence: 0.8,
@@ -61,7 +62,8 @@ The response contains per-node confidence updates:
 ## Full provenance example
 
 ```
-learn_from_outcome(
+learn(
+  action: "from_outcome",
   action_id: "fix-auth-middleware",
   status: "success",
   confidence: 0.9,
@@ -74,18 +76,18 @@ learn_from_outcome(
 
 ## Pattern
 
-1. `retrieve_context(query: "...")` → save `causal_context`
+1. `retrieve(action: "context", query: "...")` → save `causal_context`
 2. Act on retrieved knowledge
-3. `learn_from_outcome(...)` with real causal IDs and honest status
+3. `learn(action: "from_outcome", ...)` with real causal IDs and honest status
 
 ## Learn from Feedback
 
 Process explicit feedback on a specific node:
 
 ```
-learn_from_feedback(node_id: "<id>", feedback_type: "positive")
-learn_from_feedback(node_id: "<id>", feedback_type: "negative")
-learn_from_feedback(node_id: "<id>", feedback_type: "correction", correction: "The correct fact is...")
+learn(action: "from_feedback", node_id: "<id>", feedback_type: "positive")
+learn(action: "from_feedback", node_id: "<id>", feedback_type: "negative")
+learn(action: "from_feedback", node_id: "<id>", feedback_type: "correction", correction: "The correct fact is...")
 ```
 
 - `positive` → routes through `learn_from_outcome` with status `success`
@@ -97,7 +99,7 @@ learn_from_feedback(node_id: "<id>", feedback_type: "correction", correction: "T
 Check if a query represents knowledge not yet in the graph:
 
 ```
-learn_detect_novelty(query: "some new concept", threshold: 0.35)
+learn(action: "detect_novelty", query: "some new concept", threshold: 0.35)
 ```
 
 Returns `is_novel` (bool), `novelty_score` (0.0–1.0), and `nearest_nodes` with similarity scores. Higher novelty = less existing coverage.
@@ -107,7 +109,8 @@ Returns `is_novel` (bool), `novelty_score` (0.0–1.0), and `nearest_nodes` with
 Full learning pipeline for a user-model exchange:
 
 ```
-learn_from_interaction(
+learn(
+  action: "from_interaction",
   user_message: "How does the auth middleware work?",
   model_response: "The auth middleware validates JWT tokens and...",
   novelty_threshold: 0.35

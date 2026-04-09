@@ -1,6 +1,6 @@
 ---
 name: retrieve
-description: Use when the user asks to "remember", "recall", "search memory", "what do we know about", "retrieve context", or before any domain-specific action. The foundational read/write loop for Graphonomous knowledge.
+description: Use when the user asks to "recall", "search memory", "what do we know about", "retrieve context", "look up", or before any domain-specific action. The foundational read loop for Graphonomous knowledge. For storing new knowledge, use the `store` skill instead.
 argument-hint: <query>
 ---
 
@@ -14,13 +14,14 @@ Query to search for: $ARGUMENTS
 
 ## Retrieve Context
 
-Search memory by natural language query:
+Search memory by natural language query using the `retrieve` machine:
 
 ```
-retrieve_context(query: "<query>", limit: 10, expansion_hops: 1)
+retrieve(action: "context", query: "<query>", limit: 10, expansion_hops: 1)
 ```
 
 **All parameters:**
+- `action` (required) — "context" for κ-aware ranked retrieval
 - `query` (required) — natural language search
 - `limit` — max results (default 10)
 - `expansion_hops` — 0 = fast/precise, 1 = contextual neighbors, 2 = deep discovery
@@ -30,7 +31,7 @@ retrieve_context(query: "<query>", limit: 10, expansion_hops: 1)
 
 **Deep discovery example:**
 ```
-retrieve_context(query: "auth architecture", expansion_hops: 2, neighbors_per_node: 8)
+retrieve(action: "context", query: "auth architecture", expansion_hops: 2, neighbors_per_node: 8)
 ```
 
 ### Response fields to use
@@ -48,17 +49,17 @@ The response includes a `topology` object:
 - `max_kappa` — cycle complexity (0 = acyclic)
 - `scc_count` — number of strongly connected components found
 
-## Specialized Retrieval
+## Specialized Retrieval (other actions on the `retrieve` machine)
 
 ### Retrieve episodic nodes (events/observations)
 ```
-retrieve_episodic(since: "2026-03-01T00:00:00Z", until: "2026-03-29T23:59:59Z", limit: 20)
+retrieve(action: "episodic", since: "2026-03-01T00:00:00Z", until: "2026-03-29T23:59:59Z", limit: 20)
 ```
 Time-range filtered retrieval of episodic nodes, sorted by recency. All parameters are optional.
 
 ### Retrieve procedural nodes (how-to knowledge)
 ```
-retrieve_procedural(query: "how to deploy the auth service", limit: 10, min_confidence: 0.5)
+retrieve(action: "procedural", query: "how to deploy the auth service", limit: 10)
 ```
 Semantic search scoped to procedural nodes. Returns nodes with extracted steps from content.
 
@@ -67,7 +68,7 @@ Semantic search scoped to procedural nodes. Returns nodes with extracted steps f
 After acting on retrieved context, store what you learned:
 
 ```
-store_node(content: "<one atomic fact>", node_type: "semantic", confidence: 0.7, source: "conversation")
+act(action: "store_node", content: "<one atomic fact>", node_type: "semantic", confidence: 0.7, source: "conversation")
 ```
 
 **Node types:**
@@ -90,7 +91,7 @@ store_node(content: "<one atomic fact>", node_type: "semantic", confidence: 0.7,
 Connect related nodes when it improves retrieval:
 
 ```
-store_edge(source_id: "<id>", target_id: "<id>", edge_type: "supports", weight: 0.8)
+act(action: "store_edge", source_id: "<id>", target_id: "<id>", edge_type: "supports", weight: 0.8)
 ```
 
 **Edge types:** `causal`, `causes`, `resolves`, `supports`, `contradicts`, `related`, `related_to`, `part_of`, `follows`, `supersedes`, `depends_on`, `similar_to`, `derived_from`, `temporal_before`, `temporal_after`, `co_occurs`

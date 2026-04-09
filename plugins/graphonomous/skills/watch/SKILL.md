@@ -1,6 +1,6 @@
 ---
 name: watch
-description: Use when the user says "watch directory", "monitor files", "start watching", "live sync", or wants continuous filesystem monitoring synced to Graphonomous. Starts a polling loop that detects file changes and ingests them automatically.
+description: Use when the user says "watch directory", "monitor files", "start watching", "live sync", "auto-ingest", or wants continuous filesystem monitoring synced to Graphonomous. Starts a polling loop that detects file changes and ingests them automatically. Uses `act` machine for storage.
 argument-hint: <path> [--interval <ms>] [--extensions <list>]
 ---
 
@@ -39,9 +39,9 @@ Graphonomous has a built-in `watch_directory` feature that polls for file change
 ### What Gets Watched
 
 The watcher tracks:
-- **Added files**: new files matching the extension filter → `store_node`
-- **Modified files**: changed content (SHA256 differs) → update existing node or store new
-- **Removed files**: deleted files → optionally mark node confidence to 0.0
+- **Added files**: new files matching the extension filter -> `act(action: "store_node", ...)`
+- **Modified files**: changed content (SHA256 differs) -> update existing node or store new
+- **Removed files**: deleted files -> optionally mark node confidence to 0.0
 
 ### Watcher Configuration
 
@@ -76,7 +76,7 @@ mix run --no-halt -- watch /home/travis/ProjectAmp2 \
 
 This runs as a persistent process and is the recommended approach for always-on filesystem sync.
 
-## Anti-patterns
+## Anti-patterns to avoid
 
 - Don't set poll interval below 1000ms — excessive polling wastes resources
 - Don't watch node_modules, _build, deps, or .git directories

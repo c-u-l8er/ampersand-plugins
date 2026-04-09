@@ -1,6 +1,6 @@
 ---
 name: sync
-description: Use when the user says "sync", "ingest files", "update memory from disk", "scan directory", or after making significant filesystem changes. Batch-ingests changed files into Graphonomous, runs edge extraction, and optionally consolidates. Works with the PostToolUse hook that tracks file changes automatically.
+description: Use when the user says "sync", "ingest files", "update memory from disk", "scan directory", "sync to graph", or after making significant filesystem changes. Batch-ingests changed files into Graphonomous, runs edge extraction, and optionally consolidates. Routes through `act`, `learn`, and `consolidate` machines.
 argument-hint: [path] [--full] [--consolidate]
 ---
 
@@ -28,13 +28,13 @@ The PostToolUse hook on Write/Edit tools records changed file paths in a session
 **Steps:**
 
 1. Read the change tracker file (`/tmp/graphonomous-changed-files.jsonl`)
-2. For each changed file, call `store_node` with:
+2. For each changed file, call `act(action: "store_node", ...)` with:
    - `content`: first 16KB of file content
    - `node_type`: "episodic"
    - `source`: "filesystem_sync"
    - `confidence`: 0.65
    - `metadata`: `{"path": "<absolute_path>", "extension": "<ext>", "sync_reason": "file_changed"}`
-3. After all nodes are stored, create edges between related files using `store_edge`:
+3. After all nodes are stored, create edges between related files using `act(action: "store_edge", ...)`:
    - Files in the same directory get `related` edges (weight 0.4)
    - Files that import/reference each other get `derived_from` edges (weight 0.6)
 4. Clear the change tracker file
@@ -54,7 +54,7 @@ When given a path, performs a full `scan_directory`-style ingestion.
 1. List files in the target directory (respecting .gitignore, max 1MB per file)
 2. For each file matching supported extensions (.ex, .exs, .ts, .js, .tsx, .md, .html, .css, .json, .yml, .yaml, .toml, .svelte):
    - Read first 16KB
-   - Call `store_node` with file content and path metadata
+   - Call `act(action: "store_node", ...)` with file content and path metadata
 3. Create inter-file edges based on import/reference patterns
 4. Report ingestion stats
 
@@ -72,51 +72,30 @@ When given a path, performs a full `scan_directory`-style ingestion.
 
 If `--consolidate` is passed, run consolidation after ingestion:
 ```
-run_consolidation(action: "run_and_status", wait_ms: 2000)
-```
-
-## Node Storage Pattern
-
-Each file becomes one episodic node:
-
-```
-store_node(
-  content: "<file content, first 16KB>",
-  node_type: "episodic",
-  source: "filesystem_sync",
-  confidence: 0.65,
-  metadata: {
-    "path": "/home/travis/ProjectAmp2/graphonomous/lib/graphonomous/graph.ex",
-    "relative_path": "graphonomous/lib/graphonomous/graph.ex",
-    "extension": ".ex",
-    "size": 4523,
-    "sync_reason": "file_changed",
-    "synced_at": "2026-04-02T03:15:00Z"
-  }
-)
-```
-
-## Edge Extraction Patterns
-
-After storing nodes, create edges for detected references:
-
-- **Elixir**: `alias Foo.Bar` / `import Foo` / `use Foo` / `require Foo` → `derived_from` edge to the target module's file
-- **JS/TS**: `import ... from './foo'` / `require('./foo')` → `derived_from` edge
-- **Markdown**: backtick file paths, cross-project names → `related` edge
-
-```
-store_edge(source_id: "<importer_node>", target_id: "<imported_node>", edge_type: "derived_from", weight: 0.6)
+consolidate(action: "run")
 ```
 
 ## Deduplication
 
 Before storing, check if a node with the same path already exists:
 ```
-query_graph(operation: "similarity_search", query: "<file path>", limit: 1)
+consolidate(action: "query", operation: "similarity_search", query: "<file path>", limit: 1)
 ```
-If a high-similarity node exists (score > 0.9), update it via `learn_from_feedback` with type "correction" rather than creating a duplicate.
+If a high-similarity node exists (score > 0.9), update it via `learn(action: "from_feedback", feedback_type: "correction")` rather than creating a duplicate.
 
-## Anti-patterns
+## Edge Extraction Patterns
+
+After storing nodes, create edges for detected references:
+
+- **Elixir**: `alias Foo.Bar` / `import Foo` / `use Foo` / `require Foo` -> `derived_from` edge
+- **JS/TS**: `import ... from './foo'` / `require('./foo')` -> `derived_from` edge
+- **Markdown**: backtick file paths, cross-project names -> `related` edge
+
+```
+act(action: "store_edge", source_id: "<importer_node>", target_id: "<imported_node>", edge_type: "derived_from", weight: 0.6)
+```
+
+## Anti-patterns to avoid
 
 - Don't sync every tiny edit in real-time — batch at natural breakpoints
 - Don't ingest binary files, node_modules, _build, deps, or .git directories

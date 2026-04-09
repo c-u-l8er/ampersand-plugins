@@ -11,17 +11,17 @@ Initialize the Graphonomous-first memory loop for this session.
 
 1. **Retrieve prior context** for the user's current topic:
    ```
-   retrieve_context(query: "summary of prior work on <topic>")
+   retrieve(action: "context", query: "summary of prior work on <topic>")
    ```
 
 2. **Check active goals** to regain session continuity:
    ```
-   manage_goal(operation: "list_goals", filters: {"status": "active"})
+   act(action: "manage_goal", operation: "list_goals", filters: {"status": "active"})
    ```
 
 3. **Survey attention** to see what needs focus:
    ```
-   attention_survey(include_idle: false)
+   route(action: "attention_survey", include_idle: false)
    ```
 
 4. **Adopt the policy**: "Graphonomous-first memory loop is active."
@@ -30,13 +30,25 @@ Initialize the Graphonomous-first memory loop for this session.
 
 ## Core Loop (apply for remainder of session)
 
-For every non-trivial task, run this loop by default:
+For every non-trivial task, run the closed memory loop:
 
-1. **Retrieve first** — `retrieve_context` before reasoning/acting. Never skip for domain-specific work.
-2. **Reason and act** — use retrieved context + conversation to inform decisions
-3. **Store new knowledge** — `store_node` for durable atomic facts/procedures/events; `store_edge` only when the relationship genuinely improves retrieval
-4. **Close the loop** — `learn_from_outcome` whenever you have an outcome signal for a consequential action. Preserve `causal_context` between retrieval and outcome.
-5. **Maintain** — `run_consolidation` periodically and at session end
+1. **Retrieve** — `retrieve(action: "context", query: "...")` before reasoning/acting. Never skip for domain-specific work.
+2. **Route** — check `topology.routing` in response. If `"deliberate"`, run `route(action: "deliberate", query: "...")`
+3. **Act** — `act(action: "store_node", ...)` to mutate the graph
+4. **Learn** — `learn(action: "from_outcome", ...)` when you have an outcome signal. Preserve `causal_context` between retrieval and outcome.
+5. **Consolidate** — `consolidate(action: "run")` periodically and at session end
+
+### Machine Architecture (v0.4)
+
+Graphonomous v0.4 exposes **5 loop-phase machines** instead of 29 individual tools. Each machine accepts an `action` parameter:
+
+| Machine | Phase | Actions |
+|---------|-------|---------|
+| `retrieve` | "What do I know?" | context, episodic, procedural, coverage, trace_evidence, frontier |
+| `route` | "What should I do?" | topology, deliberate, attention_survey, attention_cycle, review_goal |
+| `act` | "Do it" | store_node, store_edge, delete_node, manage_edge, manage_goal, belief_revise, forget_node, forget_policy, gdpr_erase |
+| `learn` | "Did it work?" | from_outcome, from_feedback, detect_novelty, from_interaction, contradictions |
+| `consolidate` | "Clean up" | run, stats, query, traverse |
 
 ## Node and Edge Discipline
 
@@ -68,24 +80,26 @@ Do NOT:
 | `graphonomous://graph/recent` | Recently accessed nodes |
 | `graphonomous://consolidation/log` | Consolidator + orchestrator metrics |
 
-## Extended Tool Surface
+## Extended Actions (via machines)
 
-Beyond the core loop tools, these specialized tools are available:
-- **`graph_traverse`** — BFS walk from a node with depth/relationship filters
-- **`graph_stats`** — aggregate graph health (counts, distributions, orphans)
-- **`retrieve_episodic`** — time-range filtered episodic node retrieval
-- **`retrieve_procedural`** — semantic search scoped to procedural (how-to) nodes
-- **`coverage_query`** — standalone epistemic coverage check (no goal required)
-- **`learn_from_feedback`** — process positive/negative/correction on a node
-- **`learn_detect_novelty`** — check if a concept is novel to the graph
-- **`learn_from_interaction`** — full learning pipeline for user-model exchanges
-- **`delete_node`** — remove a node and its connected edges
-- **`manage_edge`** — edge lifecycle: list_all, list_for_node, update, delete
+Beyond the core loop, each machine exposes additional actions:
+- **`retrieve(action: "episodic")`** — time-range filtered episodic nodes
+- **`retrieve(action: "procedural")`** — semantic search for how-to knowledge
+- **`retrieve(action: "coverage")`** — epistemic coverage check (no goal required)
+- **`retrieve(action: "trace_evidence")`** — Dijkstra evidence paths between nodes
+- **`retrieve(action: "frontier")`** — Wilson interval uncertainty analysis
+- **`learn(action: "from_feedback")`** — process positive/negative/correction on a node
+- **`learn(action: "detect_novelty")`** — check if a concept is novel to the graph
+- **`learn(action: "from_interaction")`** — full learning pipeline for exchanges
+- **`learn(action: "contradictions")`** — detect belief conflicts
+- **`consolidate(action: "stats")`** — aggregate graph health
+- **`consolidate(action: "traverse")`** — BFS walk with depth/relationship filters
+- **`consolidate(action: "query")`** — operation-based graph inspection
 
 ## Session End Checklist
 
 Before ending a productive session:
-1. Store key new knowledge discovered via `store_node`
-2. Report pending outcomes via `learn_from_outcome`
-3. Update goal progress via `manage_goal`
-4. Trigger `run_consolidation(action: "run_and_status", wait_ms: 2000)`
+1. Store key new knowledge: `act(action: "store_node", ...)`
+2. Report pending outcomes: `learn(action: "from_outcome", ...)`
+3. Update goal progress: `act(action: "manage_goal", operation: "set_progress", ...)`
+4. Trigger consolidation: `consolidate(action: "run")`

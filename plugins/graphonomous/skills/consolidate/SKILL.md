@@ -1,6 +1,6 @@
 ---
 name: consolidate
-description: Use at end of productive sessions, after heavy storage bursts, periodically during long iterations, or when the user says "consolidate", "maintain graph", "clean up memory".
+description: Use at end of productive sessions, after heavy storage bursts, periodically during long iterations, or when the user says "consolidate", "maintain graph", "merge nodes", "clean up memory". Merges similar nodes and strengthens edges — not for deleting specific nodes (use `forgetting`) or diagnostics (use `graph-health`).
 ---
 
 # Consolidation
@@ -10,13 +10,14 @@ Trigger graph maintenance — decay weak knowledge, prune, merge duplicates, str
 ## Trigger Consolidation
 
 ```
-run_consolidation(action: "run_and_status", wait_ms: 2000)
+consolidate(action: "run", wait_ms: 2000)
 ```
 
-**Actions:**
-- `run` — fire-and-forget
-- `status` — check current state without triggering
-- `run_and_status` — trigger + wait + report (recommended)
+The `consolidate` machine supports these actions:
+- `run` — trigger consolidation (optionally wait with `wait_ms`)
+- `stats` — aggregate graph health without triggering
+- `query` — operation-based graph inspection
+- `traverse` — BFS walk with depth/relationship filters
 
 **`wait_ms`:** 0–30000 (max 30 seconds). How long to wait for completion before returning status.
 
